@@ -7,7 +7,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initFirebase();   // Connect to Firebase Realtime Database
   initSpeedLinesBackground();
-  gameSetHorsesRunning(false);
+  gameSetCarsRunning(false);
   
   // Listen for all multiplayer rooms globally
   listenToAllRooms(rooms => {
@@ -478,11 +478,11 @@ function loadRoom(room) {
   // Animate progress bar
   let progress = 0;
   const messages = [
-    "SADDLING UP THE HORSES…",
-    "CHECKING RACE CONDITIONS…",
-    "SETTING THE TRACK…",
-    "COUNTING JOCKEYS…",
-    "GATES ARE OPENING…",
+    "TUNING THE ENGINES…",
+    "CHECKING TRACK CONDITIONS…",
+    "SETTING THE CIRCUIT…",
+    "COUNTING DRIVERS…",
+    "LIGHTS ARE TURNING GREEN…",
   ];
   let msgIdx = 0;
 
@@ -524,10 +524,10 @@ function _paintLobby(room) {
   };
 
   const tagBadge    = `<span class="room-tag ${isPrivate ? 'private' : isRanked ? 'ranked' : 'fast'}">${room.tagLabel}</span>`;
-  const codeDisplay = isMultiplayer ? `<div class="lobby-room-code" style="margin-top:8px; font-family:var(--font-ui); font-size:14px; color:var(--gold-light); letter-spacing:1px"><strong>CODE:</strong> <span style="background:rgba(201,162,39,0.1); padding:2px 8px; border-radius:4px; border:1px solid rgba(201,162,39,0.2)">${room.code}</span></div>` : '';
+  const codeDisplay = isMultiplayer ? `<div class="lobby-room-code" style="margin-top:8px; font-family:var(--font-ui); font-size:14px; color:var(--neon-cyan); letter-spacing:1px"><strong>CODE:</strong> <span style="background:rgba(0, 243, 255, 0.1); padding:2px 8px; border-radius:4px; border:1px solid rgba(0, 243, 255, 0.2)">${room.code}</span></div>` : '';
 
   document.getElementById("lobbyBanner").innerHTML = `
-    <div class="lobby-room-icon-wrap" style="color:${isRanked ? 'var(--gold)' : 'var(--gold-light)'}">${isPrivate ? icons.lock : icons.game}</div>
+    <div class="lobby-room-icon-wrap" style="color:${isRanked ? 'var(--neon-magenta)' : 'var(--neon-cyan)'}">${isPrivate ? icons.lock : icons.game}</div>
     <div style="flex:1;min-width:0">
       <div class="lobby-room-title">${room.name}</div>
       <div class="lobby-room-host">Hosted by <strong style="color:var(--text-primary)">${room.host}</strong></div>
@@ -815,7 +815,7 @@ function shareInviteLink() {
   
   if (navigator.share) {
     navigator.share({
-      title: 'Join Horse Racing Elite!',
+      title: 'Join Car Racing Elite!',
       text: `Join my arena with code: ${code}`,
       url: link
     });
@@ -907,7 +907,7 @@ function shareLobbyInviteLink() {
   
   if (navigator.share) {
     navigator.share({
-      title: 'Join Horse Racing Elite!',
+      title: 'Join Car Racing Elite!',
       text: `Join my arena with code: ${code}`,
       url: link
     });
@@ -1007,11 +1007,11 @@ function gameGenerateAIBets() {
   otherPlayers.forEach(p => {
     // 80% chance for each AI player to place a bet
     if (Math.random() < 0.8) {
-      const hIdx = Math.floor(Math.random() * horses.length);
+      const hIdx = Math.floor(Math.random() * cars.length);
       const amt = (Math.floor(Math.random() * 5) + 1) * 20; // 20, 40, 60, 80, 100
       // Simulate "thinking" time by setting a readyAt second (0-20s in)
       const readyAt = Math.floor(Math.random() * 20) + 1;
-      gameRoomBets.push({ player: p, horseIndex: hIdx, amount: amt, readyAt, betConfirmed: true });
+      gameRoomBets.push({ player: p, carIndex: hIdx, amount: amt, readyAt, betConfirmed: true });
     }
   });
 }
@@ -1027,7 +1027,7 @@ function gameSyncBetsFromRoom(room) {
     .filter(p => presence[p.id]) // Only show players who are currently present
     .map(p => ({
       player: p.name,
-      horseIndex: p.horseIndex,
+      carIndex: p.carIndex,
       amount: p.amount,
       betConfirmed: !!p.betConfirmed,
       readyAt: 0 
@@ -1043,9 +1043,9 @@ function buildRaceScreenHTML() {
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11 4L6 9L11 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Back
     </button>
-    <img src="assets/logo-horizontal.png" alt="Horse Racing Elite" class="logo-horizontal"
+    <img src="assets/logo-horizontal.png" alt="Car Racing Elite" class="logo-horizontal"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-    <div class="hlogo-fallback" style="display:none; align-items:center; gap:5px"><img src="assets/horse.gif" width="24" height="15" style="transform: scaleX(-1)"> ELITE</div>
+    <div class="hlogo-fallback" style="display:none; align-items:center; gap:5px"><img src="assets/cargif.gif" width="24" height="15" style="transform: scaleX(-1)"> ELITE</div>
     <div class="top-bar-right">
       <button class="btn-mute ${musicPlaying ? '' : 'is-muted'}" onclick="toggleMusic()">
         <svg class="muteIconSvg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1057,7 +1057,7 @@ function buildRaceScreenHTML() {
       </button>
       <div class="credits-badge">
         <span class="credits-num">${balance.toLocaleString()}</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon-cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
           <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
           <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
@@ -1078,8 +1078,8 @@ function buildRaceScreenHTML() {
       <span class="ric-label">RACE</span>
       <span class="ric-val" id="gameRaceNum">Race #1</span>
     </div>
-    <div class="race-info-cell" id="gameHeaderTimerCell" style="display:none;background:rgba(201,162,39,0.1);border-left:1px solid rgba(201,162,39,0.3);border-right:1px solid rgba(201,162,39,0.3)">
-      <span class="ric-label" id="gameHeaderTimerLabel" style="color:var(--gold)">BETTING ENDS</span>
+    <div class="race-info-cell" id="gameHeaderTimerCell" style="display:none;background:rgba(0, 243, 255, 0.1);border-left:1px solid rgba(0, 243, 255, 0.3);border-right:1px solid rgba(0, 243, 255, 0.3)">
+      <span class="ric-label" id="gameHeaderTimerLabel" style="color:var(--neon-cyan)">BETTING ENDS</span>
       <span class="ric-val" id="gameHeaderTimerVal" style="color:var(--gold-light);font-size:18px">30s</span>
     </div>
     <div class="race-info-cell" id="gameRoomNameCell">
@@ -1109,13 +1109,13 @@ function buildRaceScreenHTML() {
           <!-- Premium Instruction Overlay -->
           <div class="game-instruction-overlay" id="gameInstructionOverlay">
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.2"/><path d="M10 6v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14" r="1" fill="currentColor"/></svg>
-            <span id="gameInstructionText">Select a horse below. Wait for others to bid!</span>
+            <span id="gameInstructionText">Select a car below. Wait for others to bid!</span>
           </div>
         </div>
 
         <div class="game-section">
           <div class="game-section-header">
-            <span class="game-section-title">🐎  PICK YOUR HORSE</span>
+            <span class="game-section-title">🏎️  PICK YOUR CAR</span>
             <span class="game-section-hint" id="gameRaceStatus">Tap a card to select</span>
           </div>
           <div class="game-cards-grid" id="gameBettingPanel"></div>
@@ -1123,7 +1123,7 @@ function buildRaceScreenHTML() {
 
         <div class="game-payout-preview" id="gamePayoutPreview" style="display:none">
           <div class="gpp-row">
-            <span class="gpp-item"><span class="gpp-label">Horse</span><span class="gpp-val" id="gpvHorse">—</span></span>
+            <span class="gpp-item"><span class="gpp-label">Car</span><span class="gpp-val" id="gpvHorse">—</span></span>
             <span class="gpp-item"><span class="gpp-label">Odds</span><span class="gpp-val" id="gpvOdds">—</span></span>
             <span class="gpp-item"><span class="gpp-label">Potential Win</span><span class="gpp-val gpp-win" id="gpvWin">—</span></span>
           </div>
@@ -1140,7 +1140,7 @@ function buildRaceScreenHTML() {
           <div class="howto-steps">
             <div class="howto-step">
               <span class="howto-num">1</span>
-              <div class="howto-text"><strong>Select a Horse</strong>Tap a horse card to choose your contender. Study the odds and recent form.</div>
+              <div class="howto-text"><strong>Select a Car</strong>Tap a car card to choose your contender. Study the odds and recent performance.</div>
             </div>
             <div class="howto-step">
               <span class="howto-num">2</span>
@@ -1220,9 +1220,6 @@ function buildRaceScreenHTML() {
   .race-info-strip{display:grid;grid-template-columns:repeat(2,1fr);background:var(--bg-2);border-bottom:1px solid var(--border);flex-shrink:0}
   .race-info-cell{padding:12px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);text-align:center}
   .race-info-cell:nth-child(even){border-right:none}
-  .race-info-cell:nth-child(n+3){border-bottom:none}
-  .ric-label{font-family:var(--font-ui);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-faint);display:block;margin-bottom:1px}
-  .ric-val{font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text-primary);display:block}
 
   /* ── Scrollable Game Content ── */
   .game-scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:180px;display:flex;flex-direction:column;min-height:0}
@@ -1230,21 +1227,21 @@ function buildRaceScreenHTML() {
   .game-scroll-area::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:4px}
 
   /* ── Instruction Banner ── */
-  .game-instruction{display:flex;align-items:center;gap:10px;padding:12px 20px;background:rgba(201,162,39,0.06);border-bottom:1px solid rgba(201,162,39,0.15);color:var(--gold);font-family:var(--font-ui);font-size:13px;font-weight:600;letter-spacing:0.3px;flex-shrink:0}
-  .game-instruction svg{flex-shrink:0;color:var(--gold)}
+  .game-instruction{display:flex;align-items:center;gap:10px;padding:12px 20px;background:rgba(0, 243, 255, 0.08);border-bottom:1px solid rgba(0, 243, 255, 0.2);color:var(--neon-cyan);font-family:var(--font-ui);font-size:13px;font-weight:600;letter-spacing:0.3px;flex-shrink:0}
+  .game-instruction svg{flex-shrink:0;color:var(--neon-cyan)}
 
   /* ── Track Area ── */
-  .game-track-area{padding:16px 20px 12px;background:linear-gradient(180deg,#0d200d 0%,#1a4a1a 100%);flex-shrink:0}
-  .game-track-labels{display:flex;justify-content:space-between;padding:0 30px;margin-bottom:6px;font-family:var(--font-ui);font-size:11px;letter-spacing:1.5px;color:rgba(255,255,255,0.4);text-transform:uppercase}
-  .game-track{background:#c8a96e;border-radius:50px;padding:8px 0;border:4px solid #8b6914;position:relative;box-shadow:inset 0 3px 10px rgba(0,0,0,0.4)}
-  .game-track-inner{background:#3a7d44;border-radius:42px;margin:0 30px;padding:3px 0;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.08)}
+  .game-track-area{padding:16px 20px 12px;background:linear-gradient(180deg,#0a0a2a 0%,#151540 100%);flex-shrink:0}
+  .game-track-labels{display:flex;justify-content:space-between;padding:0 30px;margin-bottom:6px;font-family:var(--font-ui);font-size:11px;letter-spacing:1.5px;color:rgba(0, 243, 255, 0.5);text-transform:uppercase}
+  .game-track{background:var(--bg-card-2);border-radius:12px;padding:8px 0;border:2px solid var(--neon-cyan);position:relative;box-shadow:0 0 20px rgba(0, 243, 255, 0.2)}
+  .game-track-inner{background:repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0, 243, 255, 0.1) 40px, rgba(0, 243, 255, 0.1) 41px), linear-gradient(180deg, #0e0e30 0%, #1a1a4a 100%);border-radius:8px;margin:0 30px;padding:3px 0;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.08)}
   .game-finish-line{position:absolute;right:130px;top:0;bottom:0;width:4px;background:repeating-linear-gradient(0deg,#fff 0,#fff 6px,#111 6px,#111 12px);z-index:10;box-shadow:0 0 6px rgba(255,255,255,0.3)}
   .game-finish-flag{position:absolute;right:124px;top:-22px;font-size:16px;z-index:11}
   .game-start-line{position:absolute;left:38px;top:0;bottom:0;width:2px;background:rgba(255,255,255,0.25);z-index:10}
   .game-lane{height:44px;display:flex;align-items:center;padding:3px 8px;border-bottom:1px dashed rgba(255,255,255,0.1);position:relative;overflow:visible}
   .game-lane:last-child{border-bottom:none}
-  .game-lane-num{width:18px;font-family:var(--font-ui);font-size:12px;font-weight:700;color:rgba(255,255,200,0.6);text-align:center;flex-shrink:0;z-index:2}
-  .game-horse-wrap{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;transition:left 0.04s linear;z-index:5}
+  .game-lane-num{width:18px;font-family:var(--font-ui);font-size:12px;font-weight:700;color:var(--neon-cyan);text-align:center;flex-shrink:0;z-index:2;text-shadow:0 0 5px var(--neon-cyan)}
+  .game-car-wrap{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;transition:left 0.04s linear;z-index:5}
   .game-crown{display:none;position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:16px;animation:crownPop 0.4s ease}
   @keyframes crownPop{0%{transform:translateX(-50%) scale(0)}70%{transform:translateX(-50%) scale(1.3)}100%{transform:translateX(-50%) scale(1)}}
 
@@ -1254,54 +1251,54 @@ function buildRaceScreenHTML() {
   .game-section-title{font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:var(--text-primary)}
   .game-section-hint{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--text-muted);letter-spacing:0.3px}
   .game-section-hint.pulse{animation:gpulse 0.8s ease infinite alternate}
-  @keyframes gpulse{from{box-shadow:none;color:var(--text-muted)}to{color:var(--gold);text-shadow:0 0 8px rgba(201,162,39,0.4)}}
+  @keyframes gpulse{from{box-shadow:none;color:var(--text-muted)}to{color:var(--neon-cyan);text-shadow:0 0 8px rgba(0, 243, 255, 0.4)}}
 
-  .horse-img{filter: hue-rotate(var(--horse-hue, 0deg)); transition: filter 0.3s ease; width: 90px; height: auto}
+  .car-img{filter: hue-rotate(var(--horse-hue, 0deg)); transition: filter 0.3s ease; width: 90px; height: auto}
 
   /* ── Horse Cards Grid ── */
   .game-cards-grid{display:grid;grid-template-columns:repeat(1,1fr);gap:20px;padding:0 20px 20px}
   @media(min-width:1000px){.game-cards-grid{grid-template-columns:repeat(2,1fr)}}
-  .game-horse-card{background:#161922;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
-  .game-horse-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;border-top:6px solid var(--card-color);border-left:6px solid var(--card-color);border-radius:24px 0 0 0;pointer-events:none;opacity:0.9}
-  .game-horse-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.15);background:#1c202a;box-shadow:0 15px 40px rgba(0,0,0,0.5)}
-  .game-horse-card.selected{border-color:var(--card-color);background:rgba(255,255,255,0.02);box-shadow:0 0 30px rgba(0,0,0,0.4)}
+  .game-car-card{background:#161922;border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:24px;cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+  .game-car-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;border-top:6px solid var(--card-color);border-left:6px solid var(--card-color);border-radius:24px 0 0 0;pointer-events:none;opacity:0.9}
+  .game-car-card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,0.15);background:#1c202a;box-shadow:0 15px 40px rgba(0,0,0,0.5)}
+  .game-car-card.selected{border-color:var(--card-color);background:rgba(255,255,255,0.02);box-shadow:0 0 30px rgba(0,0,0,0.4)}
 
-  .game-horse-card.confirmed{background:rgba(0,255,136,0.02);border-color:#00ff88}
+  .game-car-card.confirmed{background:rgba(0,255,136,0.02);border-color:#00ff88}
 
-  .game-horse-card.winner{border-color:#00ff88;background:#002215;animation:gwinner 1s ease infinite alternate}
+  .game-car-card.winner{border-color:#00ff88;background:#002215;animation:gwinner 1s ease infinite alternate}
   @keyframes gwinner{from{box-shadow:0 0 6px rgba(0,255,136,0.2)}to{box-shadow:0 0 20px rgba(0,255,136,0.5)}}
 
   .ghc-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
   .ghc-dot{width:12px;height:12px;border-radius:50%;background:var(--card-color);box-shadow:0 0 10px var(--card-color)}
-  .ghc-title{font-family:var(--font-body);font-size:15px;font-weight:800;color:var(--card-color);letter-spacing:0.5px}
+  .ghc-title{font-family:var(--font-body);font-size:15px;font-weight:800;color:var(--card-color);letter-spacing:0.5px;white-space:nowrap}
 
-  .ghc-body{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:24px;position:relative}
+  .ghc-body{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;position:relative}
   .ghc-left-col{flex:1;display:flex;flex-direction:column;gap:16px;z-index:2}
   .ghc-jockey-block{display:flex;align-items:center;gap:14px}
   .ghc-portrait{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.1);background:#000;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
   .ghc-jockey-meta{display:flex;flex-direction:column;gap:2px}
-  .ghc-jname{font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px}
+  .ghc-jname{font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
   .ghc-odds-display{display:flex;flex-direction:column}
-  .ghc-odds-num{font-family:var(--font-display);font-size:32px;font-weight:900;color:var(--gold-light);line-height:1}
-  .ghc-odds-lbl{font-family:var(--font-ui);font-size:9px;font-weight:800;color:var(--text-muted);letter-spacing:1.5px;margin-top:2px}
+  .ghc-odds-num{font-family:var(--font-display);font-size:32px;font-weight:900;color:var(--neon-cyan);line-height:1}
+  .ghc-odds-lbl{font-family:var(--font-ui);font-size:9px;font-weight:800;color:var(--text-muted);letter-spacing:1.5px;margin-top:2px;white-space:nowrap}
 
   .ghc-form-row{display:flex;gap:4px}
   .ghc-form-pill{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:900;color:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
   .ghc-form-pill.W{background:#10b981}.ghc-form-pill.P{background:#f59e0b}.ghc-form-pill.L{background:#ef4444}
 
-  .ghc-horse-side{flex:1.2;display:flex;justify-content:flex-end;align-items:center;position:relative;z-index:1}
-  .ghc-horse-side img{transform:scale(2.0) translateX(-15px);filter:hue-rotate(var(--horse-hue, 0deg)) drop-shadow(0 10px 20px rgba(0,0,0,0.5));opacity:0.95}
+  .ghc-horse-side{flex:1.5;display:flex;justify-content:flex-end;align-items:center;position:relative;z-index:1}
+  .ghc-horse-side img{transform:scale(2.1) scaleX(-1) translateX(20px) !important; filter:hue-rotate(var(--horse-hue, 0deg)) drop-shadow(0 10px 20px rgba(0,0,0,0.5));opacity:0.95}
 
   .ghc-footer{border-top:1px solid rgba(255,255,255,0.06);padding-top:16px;display:flex;flex-direction:column;gap:10px;margin-top:auto}
   .ghc-stat-bar-row{display:flex;align-items:center;gap:12px}
-  .ghc-stat-name{width:32px;font-family:var(--font-ui);font-size:12px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px}
+  .ghc-stat-name{width:48px;font-family:var(--font-ui);font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:0.5px}
   .ghc-stat-track{flex:1;height:6px;background:rgba(255,255,255,0.05);border-radius:10px;overflow:hidden}
-  .ghc-stat-fill{height:100%;border-radius:10px;background:linear-gradient(90deg, var(--gold-dim), var(--gold-light))}
+  .ghc-stat-fill{height:100%;border-radius:10px;background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta))}
   .ghc-stat-val{width:22px;font-family:var(--font-ui);font-size:13px;font-weight:800;color:#fff;text-align:right}
 
   .ghc-lock-status{position:absolute;top:20px;right:20px;font-family:var(--font-display);font-size:12px;font-weight:900;padding:4px 10px;border-radius:6px;letter-spacing:1px}
   .ghc-lock-status.confirmed{color:#00ff88;background:rgba(0,255,136,0.1)}
-  .ghc-lock-status.selected{color:var(--gold);background:rgba(201,162,39,0.1)}
+  .ghc-lock-status.selected{color:var(--neon-cyan);background:rgba(0, 243, 255, 0.1)}
 
 
 
@@ -1313,15 +1310,15 @@ function buildRaceScreenHTML() {
   .ghc-stat{margin-top:6px;display:flex;gap:4px;align-items:center}
   .ghc-slabel{font-family:var(--font-ui);font-size:10px;color:var(--text-muted);width:28px;flex-shrink:0;text-transform:uppercase}
   .ghc-strack{flex:1;height:5px;background:var(--bg-3);border-radius:3px;overflow:hidden}
-  .ghc-sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold-dim),var(--gold-light))}
+  .ghc-sfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-magenta))}
 
   /* ── Payout Preview ── */
-  .game-payout-preview{background:rgba(201,162,39,0.05);border:1px solid var(--border-gold);border-radius:10px;padding:14px 20px;margin:0 20px 12px;display:none;flex-shrink:0}
+  .game-payout-preview{background:rgba(0, 243, 255, 0.05);border:1px solid var(--neon-cyan);border-radius:10px;padding:14px 20px;margin:0 20px 12px;display:none;flex-shrink:0}
   .gpp-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
   .gpp-item{display:flex;flex-direction:column;align-items:center;gap:2px}
   .gpp-label{font-family:var(--font-ui);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase}
   .gpp-val{font-family:var(--font-ui);font-size:15px;font-weight:700;color:var(--text-primary)}
-  .gpp-val.gpp-win{color:var(--gold-light);font-size:16px}
+  .gpp-val.gpp-win{color:var(--neon-cyan);font-size:16px}
 
   /* ── Result Banner ── */
   .game-result-banner{margin:0;padding:16px;border-radius:0;text-align:center;animation:gbannerIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);flex-direction:column;align-items:center;gap:8px;display:none;flex-shrink:0;width:100%;background:var(--bg-2)}
@@ -1335,7 +1332,7 @@ function buildRaceScreenHTML() {
 
   .game-next-race-btn {
     margin-top: 10px;
-    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta));
     border: none;
     border-radius: 8px;
     color: #0a0e18;
@@ -1349,7 +1346,7 @@ function buildRaceScreenHTML() {
     align-items: center;
     gap: 8px;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(201,162,39,0.3);
+    box-shadow: 0 4px 12px rgba(0, 243, 255, 0.3);
   }
   .game-next-race-btn:hover {
     transform: translateY(-2px) scale(1.03);
@@ -1513,7 +1510,7 @@ function buildRaceScreenHTML() {
 
     .ghc-odds{font-size:26px}
     .game-cards-grid{gap:12px;padding:0 0 12px}
-    .game-horse-card{padding:16px}
+    .game-car-card{padding:16px}
     .game-section-header{padding:12px 0 8px;margin-bottom:8px}
     .game-track-area{padding:12px 16px 8px}
     .game-payout-preview{margin:0 16px 8px;padding:10px 16px}
@@ -1531,7 +1528,7 @@ function buildRaceScreenHTML() {
     .game-bet-bar{padding:20px 24px}
     .ghc-odds{font-size:26px}
     .game-cards-grid{grid-template-columns:repeat(3,1fr);gap:16px;padding:0 0 16px}
-    .game-horse-card{padding:20px}
+    .game-car-card{padding:20px}
     .game-section-header{padding:12px 0 8px;margin-bottom:8px}
     .game-track-area{padding:12px 16px 8px;position:relative}
     .game-payout-preview{margin:0 16px 8px;padding:10px 16px}
@@ -1554,21 +1551,21 @@ function buildRaceScreenHTML() {
 
 // ── RACE GAME ENGINE ─────────────────────────────────────────
 
-let gameSelectedHorse = -1;
+let gameSelectedCar = -1;
 let gameRacing        = false;
-let gameRoomBets      = []; // Array of { player, horseIndex, amount, readyAt }
+let gameRoomBets      = []; // Array of { player, carIndex, amount, readyAt }
 let gamePhase         = "betting"; // "betting", "countdown", "racing"
 let bettingTimerSecs  = 30;
 let bettingInterval   = null;
 let isBetConfirmed    = false;
 
 function initRaceGame() {
-  gameSelectedHorse = -1;
+  gameSelectedCar = -1;
   gameRacing = false;
   buildGameTrack();
   buildGameBettingPanel();
   gameUpdateBalance();
-  document.getElementById("gameRaceStatus").textContent = "Tap a card to select";
+  document.getElementById("gameRaceStatus").textContent = "Tap a card to select a car";
   document.getElementById("gameResultBanner").style.display = "none";
   document.getElementById("gamePayoutPreview").style.display = "none";
   const instr = document.getElementById("gameInstructionOverlay");
@@ -1583,7 +1580,7 @@ function initRaceGame() {
   gamePhase = "betting";
   bettingTimerSecs = 30;
   isBetConfirmed = false;
-  gameSetHorsesRunning(false);
+  gameSetCarsRunning(false);
   
   const timerBadge = document.getElementById("gameTimerBadge");
   if (timerBadge) {
@@ -1713,7 +1710,7 @@ function tickBettingTimer() {
     if (isBetConfirmed) {
       finalBetAmt = parseInt(document.getElementById("gameBetAmount").value) || 0;
     } else {
-      gameSelectedHorse = -1; // No horse for you
+      gameSelectedCar = -1; // No car for you
       console.log("Betting cancelled - player did not confirm in time.");
     }
     
@@ -1729,7 +1726,7 @@ function buildGameTrack() {
   ti.innerHTML = "";
   positions.length = 0; velocities.length = 0;
 
-  horses.forEach((h, i) => {
+  cars.forEach((h, i) => {
     const lane = document.createElement("div");
     lane.className = "game-lane";
     const num = document.createElement("div");
@@ -1738,9 +1735,9 @@ function buildGameTrack() {
     lane.appendChild(num);
 
     const wrap = document.createElement("div");
-    wrap.className = "game-horse-wrap";
+    wrap.className = "game-car-wrap";
     wrap.id = "ghwrap" + i;
-    wrap.innerHTML = buildHorseSVG(h.color, i);
+    wrap.innerHTML = buildCarSVG(h.color, i);
 
     const crown = document.createElement("div");
     crown.className = "game-crown";
@@ -1760,14 +1757,14 @@ function buildGameBettingPanel() {
   const panel = document.getElementById("gameBettingPanel");
   if (!panel) return;
   panel.innerHTML = "";
-  horses.forEach((h, i) => {
+  cars.forEach((h, i) => {
     const card = document.createElement("div");
-    card.className = "game-horse-card";
+    card.className = "game-car-card";
     card.id = "gcard" + i;
     card.style.setProperty("--card-color", h.color);
-    card.onclick = () => gameSelectHorse(i);
+    card.onclick = () => gameSelectCar(i);
     const formBadges = h.form.map(f => `<span class="ghc-form-pill ${f}">${f}</span>`).join("");
-    const jockeyPortrait = `jockey_portrait_premium.png`; 
+    const jockeyPortrait = `assets/driver_portrait_premium.png`; 
     card.innerHTML = `
       <div class="ghc-head">
         <div class="ghc-dot"></div>
@@ -1777,7 +1774,7 @@ function buildGameBettingPanel() {
       <div class="ghc-body">
         <div class="ghc-left-col">
           <div class="ghc-jockey-block">
-            <img src="${jockeyPortrait}" class="ghc-portrait" alt="Jockey">
+            <img src="${jockeyPortrait}" class="ghc-portrait" alt="Driver">
             <div class="ghc-jockey-meta">
               <div class="ghc-jname">${h.jockey}</div>
               <div class="ghc-odds-display">
@@ -1792,7 +1789,7 @@ function buildGameBettingPanel() {
         </div>
         
         <div class="ghc-horse-side">
-          ${buildHorseSVG(h.color, i)}
+          ${buildCarSVG(h.color, i)}
         </div>
       </div>
 
@@ -1801,14 +1798,14 @@ function buildGameBettingPanel() {
 
       <div class="ghc-footer">
         <div class="ghc-stat-bar-row">
-          <span class="ghc-stat-name">SPD</span>
-          <div class="ghc-stat-track"><div class="ghc-stat-fill" style="width:${h.speed}%"></div></div>
-          <span class="ghc-stat-val">${h.speed}</span>
+          <span class="ghc-stat-name">TSPD</span>
+          <div class="ghc-stat-track"><div class="ghc-stat-fill" style="width:${((h.topSpeed - 280) / 70 * 100)}%"></div></div>
+          <span class="ghc-stat-val">${h.topSpeed}</span>
         </div>
         <div class="ghc-stat-bar-row">
-          <span class="ghc-stat-name">STM</span>
-          <div class="ghc-stat-track"><div class="ghc-stat-fill" style="width:${h.stamina}%; background:linear-gradient(90deg, #b5803a, #d4a04e)"></div></div>
-          <span class="ghc-stat-val">${h.stamina}</span>
+          <span class="ghc-stat-name">HPR</span>
+          <div class="ghc-stat-track"><div class="ghc-stat-fill" style="width:${((h.horsepower - 600) / 300 * 100)}%; background:linear-gradient(90deg, var(--neon-magenta), var(--neon-purple))"></div></div>
+          <span class="ghc-stat-val">${h.horsepower}</span>
         </div>
       </div>
       <div class="ghc-lock-status" id="lockStatus${i}"></div>
@@ -1817,10 +1814,10 @@ function buildGameBettingPanel() {
   });
 }
 
-function gameSelectHorse(i) {
+function gameSelectCar(i) {
   if (gameRacing || isBetConfirmed) return;
-  gameSelectedHorse = i;
-  document.querySelectorAll(".game-horse-card").forEach((c, idx) => {
+  gameSelectedCar = i;
+  document.querySelectorAll(".game-car-card").forEach((c, idx) => {
     const isSel = (idx === i);
     c.classList.toggle("selected", isSel);
     const status = document.getElementById("lockStatus" + idx);
@@ -1834,7 +1831,7 @@ function gameSelectHorse(i) {
       }
     }
   });
-  document.getElementById("gameRaceStatus").textContent = "Selected: #" + (i+1) + " " + horses[i].name;
+  document.getElementById("gameRaceStatus").textContent = "Selected: #" + (i+1) + " " + cars[i].name;
   const btn = document.getElementById("gameRaceBtn");
   if (btn) btn.disabled = false;
   
@@ -1852,11 +1849,11 @@ function gameSetBet(v) {
 function gameUpdatePreview() {
   const amt = parseInt(document.getElementById("gameBetAmount").value) || 0;
   const prev = document.getElementById("gamePayoutPreview");
-  if (gameSelectedHorse >= 0 && amt > 0) {
-    const { gross, profit } = calcPayout(gameSelectedHorse, amt);
+  if (gameSelectedCar >= 0 && amt > 0) {
+    const { gross, profit } = calcPayout(gameSelectedCar, amt);
     prev.style.display = "flex";
-    document.getElementById("gpvHorse").textContent = horses[gameSelectedHorse].name;
-    document.getElementById("gpvOdds").textContent  = horses[gameSelectedHorse].odds.toFixed(1) + "x";
+    document.getElementById("gpvHorse").textContent = cars[gameSelectedCar].name;
+    document.getElementById("gpvOdds").textContent  = cars[gameSelectedCar].odds.toFixed(1) + "x";
     document.getElementById("gpvWin").textContent   = "$" + gross + " (+$" + profit + " profit)";
   } else {
     prev.style.display = "none";
@@ -1866,7 +1863,7 @@ function gameUpdatePreview() {
 function gameStartRace() {
   if (gameRacing) return;
   const betAmt = parseInt(document.getElementById("gameBetAmount").value) || 0;
-  const check  = validateBet(gameSelectedHorse, betAmt);
+  const check  = validateBet(gameSelectedCar, betAmt);
   if (!check.valid) { alert(check.reason); return; }
 
   // LOCK IN BET: Instead of starting immediately, we just mark as confirmed.
@@ -1879,10 +1876,10 @@ function gameStartRace() {
       btn.textContent = "BET CONFIRMED";
     }
     // Highlight the selected card to show it's locked
-    const selectedCard = document.getElementById("gcard" + gameSelectedHorse);
+    const selectedCard = document.getElementById("gcard" + gameSelectedCar);
     if (selectedCard) selectedCard.classList.add("confirmed");
     
-    const status = document.getElementById("lockStatus" + gameSelectedHorse);
+    const status = document.getElementById("lockStatus" + gameSelectedCar);
     if (status) {
       status.textContent = "LOCKED";
       status.className = "ghc-lock-status confirmed";
@@ -1890,7 +1887,7 @@ function gameStartRace() {
     
     // Sync to Firebase if in multiplayer
     if (activeRoom && activeRoom.code) {
-      updatePlayerBetInFirebase(activeRoom.code, playerId, gameSelectedHorse, betAmt);
+      updatePlayerBetInFirebase(activeRoom.code, playerId, gameSelectedCar, betAmt);
     }
 
     gameRenderLiveBets();
@@ -1940,8 +1937,8 @@ function startRaceCountdown(betAmt) {
   }, 1000);
 }
 
-function gameSetHorsesRunning(running) {
-  const targets = document.querySelectorAll('.horse-img, .loading-horse-runner img, .bg-gif');
+function gameSetCarsRunning(running) {
+  const targets = document.querySelectorAll('.car-img, .loading-horse-runner img, .bg-gif');
   targets.forEach(img => {
     if (running) {
       if (img.dataset.originalSrc) {
@@ -1980,14 +1977,14 @@ function executeRace(betAmt) {
 
   balance -= betAmt;
   gameRacing = true;
-  gameSetHorsesRunning(true);
+  gameSetCarsRunning(true);
   raceCount++;
   document.getElementById("gameRaceBtn").disabled = true;
   document.getElementById("gameResultBanner").style.display = "none";
   const instr = document.getElementById("gameInstructionOverlay");
   if (instr) instr.style.display = "none";
   document.getElementById("gameRaceStatus").classList.add("pulse");
-  document.getElementById("gameRaceStatus").textContent = "🏇 Race in progress...";
+  document.getElementById("gameRaceStatus").textContent = "🏎️ Race in progress...";
   document.getElementById("gameRaceNum").textContent = "Race #" + raceCount;
   gameUpdateBalance();
   gamePhase = "racing";
@@ -1998,19 +1995,19 @@ function executeRace(betAmt) {
 
   let tick = 0;
   const finishOrder = [];
-  const finished = new Array(horses.length).fill(false);
+  const finished = new Array(cars.length).fill(false);
 
   function animate() {
     tick++;
-    for (let i = 0; i < horses.length; i++) {
+    for (let i = 0; i < cars.length; i++) {
       if (finished[i]) continue;
-      const done = tickHorse(i, tick);
+      const done = tickCar(i, tick);
       if (done) { finished[i] = true; finishOrder.push(i); }
       const el = document.getElementById("ghwrap" + i);
       if (el) el.style.left = positions[i] + "%";
-      gameAnimateLegs(i, tick);
+      gameAnimateWheels(i, tick);
     }
-    if (finishOrder.length === horses.length || (finishOrder.length > 0 && tick > 500)) {
+    if (finishOrder.length === cars.length || (finishOrder.length > 0 && tick > 500)) {
       cancelAnimationFrame(animFrame);
       gameEndRace(finishOrder[0], betAmt);
     } else {
@@ -2020,7 +2017,7 @@ function executeRace(betAmt) {
   animFrame = requestAnimationFrame(animate);
 }
 
-function gameAnimateLegs(i, tick) {
+function gameAnimateWheels(i, tick) {
   const speed = velocities[i] || 0.5;
   const phase = (tick * speed * 0.5) % (Math.PI * 2);
   const offsets = [0, Math.PI, Math.PI/2, Math.PI*1.5];
@@ -2035,13 +2032,13 @@ function gameAnimateLegs(i, tick) {
 
 function gameEndRace(winner, betAmt) {
   gameRacing = false;
-  gameSetHorsesRunning(false);
+  gameSetCarsRunning(false);
   document.getElementById("gameRaceStatus").classList.remove("pulse");
   document.getElementById("gameRaceStatus").textContent = "Race Finished!";
 
   const crown = document.getElementById("gcrown" + winner);
   if (crown) crown.style.display = "block";
-  document.querySelectorAll(".game-horse-card").forEach((c, i) => { if (i === winner) c.classList.add("winner"); });
+  document.querySelectorAll(".game-car-card").forEach((c, i) => { if (i === winner) c.classList.add("winner"); });
 
   const banner = document.getElementById("gameResultBanner");
   const module = document.getElementById("gameBetModule");
@@ -2054,15 +2051,15 @@ function gameEndRace(winner, betAmt) {
     endFirebaseRoom(activeRoom.code);
   }
   
-  // Handle the case where player didn't bet (gameSelectedHorse === -1 or betAmt === 0)
-  const didBet = gameSelectedHorse >= 0 && betAmt > 0;
-  const won = didBet && winner === gameSelectedHorse;
+  // Handle the case where player didn't bet (gameSelectedCar === -1 or betAmt === 0)
+  const didBet = gameSelectedCar >= 0 && betAmt > 0;
+  const won = didBet && winner === gameSelectedCar;
   
   // Calculate other players' outcomes
   const allResults = gameRoomBets
-    .filter(b => b.horseIndex >= 0 && b.amount > 0)
+    .filter(b => b.carIndex >= 0 && b.amount > 0)
     .map(b => {
-      const isWin = b.horseIndex === winner;
+      const isWin = b.carIndex === winner;
       let payout = 0;
       if (isWin) {
         const { gross } = calcPayout(winner, b.amount);
@@ -2074,27 +2071,27 @@ function gameEndRace(winner, betAmt) {
   if (!didBet) {
     // Player didn't place a bet - they just watched
     banner.className = "game-result-banner lose";
-    document.getElementById("gameResultTitle").textContent = "🏇 #" + (winner+1) + " " + horses[winner].name + " wins!";
+    document.getElementById("gameResultTitle").textContent = "🏁 #" + (winner+1) + " " + cars[winner].name + " wins!";
     document.getElementById("gameResultSub").textContent   = "You didn't place a bet this race.";
     document.getElementById("gameResultMoney").className   = "grb-money lose";
     document.getElementById("gameResultMoney").textContent = "$0";
-    recordResult(horses[winner], false, 0, 0);
+    recordResult(cars[winner], false, 0, 0);
   } else if (won) {
     const { gross, profit } = calcPayout(winner, betAmt);
     balance += gross;
     banner.className = "game-result-banner win";
-    document.getElementById("gameResultTitle").textContent = "🏆 WINNER! #" + (winner+1) + " " + horses[winner].name;
-    document.getElementById("gameResultSub").textContent   = "Your horse dominated the field!";
+    document.getElementById("gameResultTitle").textContent = "🏆 WINNER! #" + (winner+1) + " " + cars[winner].name;
+    document.getElementById("gameResultSub").textContent   = "Your car dominated the track!";
     document.getElementById("gameResultMoney").className   = "grb-money win";
     document.getElementById("gameResultMoney").textContent = "+$" + gross + " (net +$" + profit + ")";
-    recordResult(horses[winner], true, profit, betAmt);
+    recordResult(cars[winner], true, profit, betAmt);
   } else {
     banner.className = "game-result-banner lose";
-    document.getElementById("gameResultTitle").textContent = "😔 #" + (winner+1) + " " + horses[winner].name + " wins!";
+    document.getElementById("gameResultTitle").textContent = "😔 #" + (winner+1) + " " + cars[winner].name + " wins!";
     document.getElementById("gameResultSub").textContent   = "Better luck in the next race!";
     document.getElementById("gameResultMoney").className   = "grb-money lose";
     document.getElementById("gameResultMoney").textContent = "-$" + betAmt;
-    recordResult(horses[winner], false, -betAmt, betAmt);
+    recordResult(cars[winner], false, -betAmt, betAmt);
   }
 
   gameUpdateBalance();
@@ -2116,7 +2113,7 @@ function gameRenderLiveBets() {
   list.innerHTML = gameRoomBets.map(b => {
     const isReady = (gamePhase !== "betting") || 
                     (b.betConfirmed !== undefined ? b.betConfirmed : elapsed >= b.readyAt);
-    const horse = b.horseIndex !== undefined ? horses[b.horseIndex] : null;
+    const horse = b.carIndex !== undefined ? cars[b.carIndex] : null;
     
     if (!isReady) {
       return `
@@ -2252,10 +2249,10 @@ function gameRenderHistory() {
   `;
 }
 
-// ── SVG HORSE BUILDER ────────────────────────────────────────
-function buildHorseSVG(color, idx) {
+// ── CAR SPRITE BUILDER ────────────────────────────────────────
+function buildCarSVG(color, idx) {
   const hueRotate = idx * 60; 
-  return `<img class="horse-img" src="assets/horse.gif" width="90" height="70" style="display:block; --horse-hue:${hueRotate}deg" onload="if(!gameRacing) gameSetHorsesRunning(false)">`;
+  return `<img class="car-img" src="assets/cargif.gif" width="90" height="70" style="display:block; transform: scaleX(-1); --horse-hue:${hueRotate}deg" onload="if(!gameRacing) gameSetCarsRunning(false)">`;
 }
 /*
 function buildHorseSVG_old(color, idx) {
